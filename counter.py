@@ -32,16 +32,17 @@ class Counter:
         return res
 
     def add(self, increment, now, scheduler, granularity):
+        first_update = (self.val == 0)
+
+        # Actually account
+        self.val += increment
 
         # Schedule counter if it has time based granularity
         if granularity.time_based:
             # and this is the first update
-            if self.val == 0:
+            if first_update:
                 scheduler.add(self, now + granularity.time_based)
                 self.is_scheduled = True
-
-        # Actually account
-        self.val += increment
 
         if granularity.value_based and not self.passed_value_limit and self.val >= granularity.value_based:
             if self.is_scheduled:
