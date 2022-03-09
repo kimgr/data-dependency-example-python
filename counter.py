@@ -2,9 +2,9 @@
 
 
 class Counter:
-    """This is a counter which can be given a "granularity" configuration
+    """This is a counter which can be given a "policy" configuration
     which decides when some external entity shall be informed about
-    the changes in the counter. The granularity can be "value based"
+    the changes in the counter. The policy can be "value based"
     (external should be informed when value crosses a threshold) or
     "time based" (external should be informed at least within
     specified time from when value last changed) or both.
@@ -31,22 +31,22 @@ class Counter:
         self.val = 0
         return res
 
-    def add(self, increment, now, scheduler, granularity):
+    def add(self, increment, now, scheduler, policy):
 
-        # Schedule counter if it has time based granularity
-        if granularity.time_based:
+        # Schedule counter if it has time based policy
+        if policy.time_limit:
             # and this is the first update
             if self.val == 0:
-                scheduler.add(self, now + granularity.time_based)
+                scheduler.add(self, now + policy.time_limit)
                 self.is_scheduled = True
 
         # Actually account
         self.val += increment
 
-        if granularity.value_based and not self.passed_value_limit and self.val >= granularity.value_based:
+        if policy.value_limit and not self.passed_value_limit and self.val >= policy.value_limit:
             if self.is_scheduled:
                 scheduler.remove(self)
                 self.is_scheduled = False
-            return CounterState.READY
+            return True
 
-        return CounterState.PENDING
+        return False
