@@ -36,16 +36,18 @@ class Counter:
         aginst policy. Return True if value limit policy is met or False if
         still pending.
         """
+        first_update = (self.val == 0)
+
+        # Actually account
+        self.val += increment
 
         # Schedule counter if it has time based policy
         if policy.time_limit:
             # and this is the first update
-            if self.val == 0:
+            if first_update:
                 scheduler.add(self, now + policy.time_limit)
                 self.is_scheduled = True
 
-        # Actually account
-        self.val += increment
 
         if policy.value_limit and not self.passed_value_limit and self.val >= policy.value_limit:
             if self.is_scheduled:
