@@ -32,6 +32,10 @@ class Counter:
         return res
 
     def add(self, increment, now, scheduler, policy):
+        """Add increment to counter, possibly schedule it, and evaluate it
+        aginst policy. Return True if value limit policy is met or False if
+        still pending.
+        """
 
         # Schedule counter if it has time based policy
         if policy.time_limit:
