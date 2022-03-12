@@ -41,16 +41,17 @@ class Counter:
         # Actually account
         self.val += increment
 
-        # Schedule counter if it has time based policy and this is the first
-        # update
-        if policy.time_limit and first_update:
-            scheduler.add(self, now + policy.time_limit)
-            self.is_scheduled = True
-
+        # Evaluate value limit policy first.
         if policy.value_limit and not self.passed_value_limit and self.val >= policy.value_limit:
             if self.is_scheduled:
                 scheduler.remove(self)
                 self.is_scheduled = False
             return True
+
+        # Schedule counter if it has time based policy and this is the first
+        # update
+        if policy.time_limit and first_update:
+            scheduler.add(self, now + policy.time_limit)
+            self.is_scheduled = True
 
         return False
